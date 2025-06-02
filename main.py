@@ -9,8 +9,6 @@ import team_create as tc
 import board_create as bc
 import unit_create as uc
 
-
-import tkinter
 from time import sleep
 from typing_extensions import Any
 
