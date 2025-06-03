@@ -125,7 +125,7 @@ def team_turn(option: int,
         delta_x, delta_y = new_coords()
         attack_x = delta_x + team.unit_list_inst[unit_id].x
         attack_y = delta_y + team.unit_list_inst[unit_id].y
-        if board.get_occupancy_board()[attack_x][attack_y] not in (team.symbol, "0"):
+        if board.get_occupancy_board()[attack_x][attack_y] == enemy_team.symbol:
             team.unit_list_inst[unit_id].attack(delta_x,
                                                 delta_y,
                                                 board.board_size)
