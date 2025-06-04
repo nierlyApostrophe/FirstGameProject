@@ -64,6 +64,8 @@ def ret_valid(min_buf: Any,
                           f"Expected type {type_check} ({min_buf+1}-{max_buf-1}): ")
     return buf
 
+##############################################
+
 def add_units(team: tc.Team,
               unit_amount: int,
               inf_amount: int) -> None:
@@ -84,9 +86,10 @@ def option_menu() -> int:
     Checks if the input is an int of set
     :return: 1 or 2
     """
-    return ret_valid(0, 3, int, "\nChoose what to do:\n"
+    return ret_valid(0, 4, int, "\nChoose what to do:\n"
                                                         "1. Move your unit\n"
-                                                        "2. Attack enemy unit\n")
+                                                        "2. Attack enemy unit\n"
+                                                        "3. Exit the program\n")
 
 def new_coords() -> tuple[int, int]:
     """
@@ -119,7 +122,6 @@ def team_turn(option: int,
             team.unit_list_inst[unit_id].move(delta_x,
                                               delta_y,
                                               board.board_size)
-            return
 
     elif option == 2:
         delta_x, delta_y = new_coords()
@@ -132,7 +134,10 @@ def team_turn(option: int,
             for enemy_unit in enemy_team.unit_list_inst:
                 if enemy_unit.x == attack_x and enemy_unit.y == attack_y:
                     enemy_unit.health -= team.unit_list_inst[unit_id].damage
-                    return
+
+    elif option == 3:
+        print("Exiting the program")
+        exit()
 
     else:
         print("Invalid choice!")
