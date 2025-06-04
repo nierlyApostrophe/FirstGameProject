@@ -128,9 +128,6 @@ def team_turn(option: int,
         attack_x = delta_x + team.unit_list_inst[unit_id].x
         attack_y = delta_y + team.unit_list_inst[unit_id].y
         if board.get_occupancy_board()[attack_x][attack_y] == enemy_team.symbol:
-            team.unit_list_inst[unit_id].attack(delta_x,
-                                                delta_y,
-                                                board.board_size)
             for enemy_unit in enemy_team.unit_list_inst:
                 if enemy_unit.x == attack_x and enemy_unit.y == attack_y:
                     enemy_unit.health -= team.unit_list_inst[unit_id].damage
@@ -156,6 +153,7 @@ def team_info(team: tc.Team):
         print(f"{i}. Team{team.symbol} unit: {unit.name}, position: {unit.x, unit.y}, "
               f"health: {unit.health}, damage: {unit.damage}, moves: {unit.moves}")
         i += 1
+    print()
 
 def main() -> None:
     board_size = ret_valid(bc.Board.min_board_size - 1, bc.Board.max_board_size + 1, int,
@@ -219,6 +217,9 @@ def main() -> None:
                       team1)
             game_queue = True
         new_board.empty_board()
+
+        for team in teams:
+            team.health_check()
 
 if __name__ == "__main__":
     main()

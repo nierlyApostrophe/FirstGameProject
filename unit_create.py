@@ -35,12 +35,13 @@ class Unit(ABC):
         else:
             print("Invalid move. You've reached the end of the board.")
 
-    def death(self) -> None:
+    def is_dead(self) -> bool | None:
         """
         Removes the unit from the board whenever its health fully depletes
         """
         if self.health <= 0:
-            print(f"Your {self.name} has died")
+            print(f"{self.name} has died")
+            return True
 
 class Infantry(Unit):
 
@@ -50,7 +51,7 @@ class Infantry(Unit):
     def __init__(self):
         super().__init__()
         self.moves = 2
-        self.health = 10
+        self.health = 1
         self.damage = 4
 
 

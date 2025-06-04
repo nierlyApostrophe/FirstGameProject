@@ -25,7 +25,9 @@ class Team:
 
     def health_check(self):
         for unit in self.unit_list_inst:
-            unit.death()
+            print(f"Team {self.symbol}'s", end=" ")
+            if unit.is_dead():
+                self.unit_list_inst.remove(unit)
 
 if __name__ == "__main__":
     help(Team)
