@@ -134,6 +134,10 @@ def team_turn(option: int,
             for enemy_unit in enemy_team.unit_list_inst:
                 if enemy_unit.x == attack_x and enemy_unit.y == attack_y:
                     enemy_unit.health -= team.unit_list_inst[unit_id].damage
+                    print("Successfully attacked")
+                    return
+            print("Failed to attack")
+        print("Failed to find an enemy")
 
     elif option == 3:
         print("Exiting the program")
@@ -180,8 +184,13 @@ def main() -> None:
     game_queue: bool = True
 
     while True:
-        print(new_board.get_occupancy_board())
-        new_board.empty_board()
+        print("old occup\n", new_board.get_occupancy_board())
+        for team in teams:
+            team.health_check()
+            new_board.get_board(team)
+        new_board.get_occupancy_board()
+        print("new occup\n", new_board.get_occupancy_board())
+        new_board.draw_board()
         sleep(1)
         if game_queue:
             print("Turn of Team 1!")
@@ -209,11 +218,7 @@ def main() -> None:
                                 f"\nEnter unit's number (1 - {len(team2.unit_list_inst)}): ") - 1,
                       team1)
             game_queue = True
-        for team in teams:
-            team.health_check()
-            new_board.get_board(team)
-        new_board.draw_board()
-        new_board.get_occupancy_board()
+        new_board.empty_board()
 
 if __name__ == "__main__":
     main()

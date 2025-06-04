@@ -35,23 +35,6 @@ class Unit(ABC):
         else:
             print("Invalid move. You've reached the end of the board.")
 
-    def attack(self, delta_x: int, delta_y: int, board_size: int) -> None:
-        """
-        Perform initialized amount of damage to a selected square
-        """
-        new_x = self.x + delta_x
-        new_y = self.y + delta_y
-        distance = abs(delta_x) + abs(delta_y)
-
-        if 0 <= new_x < board_size and 0 <= new_y < board_size:
-            if distance <= self.attack_radius:
-                print(f"You've attacked enemy at {new_x, new_y} "
-                      f"for {self.damage} damage")
-            else:
-                print("The square is too far, this unit cannot reach it.")
-        else:
-            print("Invalid move. You've reached the end of the board.")
-
     def death(self) -> None:
         """
         Removes the unit from the board whenever its health fully depletes

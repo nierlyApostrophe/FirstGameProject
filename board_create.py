@@ -70,6 +70,7 @@ class Board:
         """
         for unit in team.unit_list_inst:
             self.__board[unit.x][unit.y] = unit.symbol + team.symbol
+            self.__occupancy_board[unit.x][unit.y] = team.symbol
         return self.__board
 
     def get_occupancy_board(self) -> list[list[str]]:
