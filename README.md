@@ -5,7 +5,7 @@ Set a board size, the amount of total units, and the type of each unit in your t
 
 ## How to play?
 
-Run command `python C:\path\ArmyGameProject\main.py`
+Run command `python C:\path\ArmyGameProject\main.py`.  
 The game goes on infinitely until all the units of a Team are dead.
 
 1. You will be asked the amount of total units per team; 
