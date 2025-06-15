@@ -1,10 +1,6 @@
 # todo
-#  "
-#  * Додати валідацію delta_x, delta_y у team_turn() (юніт не може виходити за межі дошки)
-#  * Додати перевірку зайнятості клітинки іншим юнітом
-#  * Додати методи attack(), death() класу Unit (скоріш за все не Unit, а Team)
-#  * Додати меню вибору дії: хід, атака тощо.
-#  "
+#  Додати валідацію delta_x, delta_y у team_turn() (юніт не може виходити за межі дошки)
+
 import team_create as tc
 import board_create as bc
 import unit_create as uc
@@ -91,7 +87,7 @@ def option_menu() -> int:
                                                         "2. Attack enemy unit\n"
                                                         "3. Exit the program\n")
 
-def new_coords() -> tuple[int, int]:
+def new_delta_coords() -> tuple[int, int]:
     """
     Requests two inputs for delta x, delta y
     :return: tuple of integers
@@ -103,8 +99,44 @@ def new_coords() -> tuple[int, int]:
 def team_turn(option: int,
               board: bc.Board,
               team: tc.Team,
-              unit_id: int,
               enemy_team: tc.Team) -> None:
+
+    if option == 3:
+        print("Exiting the program")
+        exit()
+
+    unit_id: int = ret_valid(0,
+                            len(team.unit_list_inst) + 1,
+                            int,
+                            f"\nEnter unit's number (1 - {len(team.unit_list_inst)}): ") - 1
+
+    if option == 1:
+        delta_x, delta_y = new_delta_coords()
+        new_x = delta_x + team.unit_list_inst[unit_id].x
+        new_y = delta_y + team.unit_list_inst[unit_id].y
+        if 0 > new_x > board.board_size and 0 > new_y > board.board_size:
+            print("Invalid coordinates")
+            return
+        if board.get_occupancy_board()[new_x][new_y] == "0":
+            team.unit_list_inst[unit_id].move(delta_x,
+                                              delta_y,
+                                              board.board_size)
+
+    elif option == 2:
+        delta_x, delta_y = new_delta_coords()
+        attack_x = delta_x + team.unit_list_inst[unit_id].x
+        attack_y = delta_y + team.unit_list_inst[unit_id].y
+        if board.get_occupancy_board()[attack_x][attack_y] == enemy_team.symbol:
+            for enemy_unit in enemy_team.unit_list_inst:
+                if enemy_unit.x == attack_x and enemy_unit.y == attack_y:
+                    enemy_unit.health -= team.unit_list_inst[unit_id].damage
+                    print(f"Successfully attacked {enemy_unit.name} at ({enemy_unit.x}, {enemy_unit.y})\n")
+                    return
+        print(f"Failed to find an enemy at ({attack_x}, {attack_y})\n")
+
+
+    else:
+        print("Invalid choice!")
     """
     Performs a turn over a unit for a selected team
     (i.e. unit selection, movement, attack)
@@ -114,34 +146,6 @@ def team_turn(option: int,
     :param unit_id: id of a unit to be selected
     :param enemy_team: team, which units will be attacked
     """
-    if option == 1:
-        delta_x, delta_y = new_coords()
-        new_x = delta_x + team.unit_list_inst[unit_id].x
-        new_y = delta_y + team.unit_list_inst[unit_id].y
-        if board.get_occupancy_board()[new_x][new_y] == "0":
-            team.unit_list_inst[unit_id].move(delta_x,
-                                              delta_y,
-                                              board.board_size)
-
-    elif option == 2:
-        delta_x, delta_y = new_coords()
-        attack_x = delta_x + team.unit_list_inst[unit_id].x
-        attack_y = delta_y + team.unit_list_inst[unit_id].y
-        if board.get_occupancy_board()[attack_x][attack_y] == enemy_team.symbol:
-            for enemy_unit in enemy_team.unit_list_inst:
-                if enemy_unit.x == attack_x and enemy_unit.y == attack_y:
-                    enemy_unit.health -= team.unit_list_inst[unit_id].damage
-                    print("Successfully attacked")
-                    return
-            print("Failed to attack")
-        print("Failed to find an enemy")
-
-    elif option == 3:
-        print("Exiting the program")
-        exit()
-
-    else:
-        print("Invalid choice!")
 
 def team_info(team: tc.Team):
     """
@@ -156,11 +160,16 @@ def team_info(team: tc.Team):
     print()
 
 def main() -> None:
-    board_size = ret_valid(bc.Board.min_board_size - 1, bc.Board.max_board_size + 1, int,
+    board_size = ret_valid(bc.Board.min_board_size - 1,
+                           bc.Board.max_board_size + 1,
+                           int,
                            f"Enter the board size ({bc.Board.min_board_size}-{bc.Board.max_board_size}): ")
     new_board: bc.Board = bc.Board(board_size)
 
-    unit_amount = ret_valid(0, board_size + 1, int, "Enter the amount of units per team: ")
+    unit_amount = ret_valid(0,
+                            board_size + 1,
+                            int,
+                            "Enter the amount of units per team: ")
 
     # creating teams, adding units to them
     team1: tc.Team = tc.Team(unit_amount)
@@ -169,57 +178,50 @@ def main() -> None:
     team2.symbol = "2"
     teams: tuple = (team1, team2)
     for team in teams:
-        inf_amount = ret_valid(-1, unit_amount + 1, int, f"Team {team.symbol}: How much infantry troops do you want "
-                                                         f"(0-{unit_amount}). "
-                                                         "Cavalry will be decided as the rest: ")
+        inf_amount = ret_valid(-1,
+                               unit_amount + 1,
+                               int,
+                               f"Team {team.symbol}: How much infantry troops do you want "
+                               f"(0-{unit_amount}). Cavalry will be decided as the rest: ")
         add_units(team, unit_amount, inf_amount)
 
     new_board.add_team(team1)
     new_board.add_team(team2)
 
     print("0————————>Y\n|\n|\n/\nX")
-    new_board.draw_board()
     game_queue: bool = True
 
     while True:
-        print("old occup\n", new_board.get_occupancy_board())
         for team in teams:
             team.health_check()
+            if not team.unit_list_inst:
+                print(f"Team {team.symbol} has lost!")
+                exit()
             new_board.get_board(team)
         new_board.get_occupancy_board()
-        print("new occup\n", new_board.get_occupancy_board())
         new_board.draw_board()
         sleep(1)
         if game_queue:
             print("Turn of Team 1!")
             team_info(team1)
+            sleep(0.5)
             team_info(team2)
             team_turn(option_menu(),
                       new_board,
                       team1,
-                      ret_valid(0,
-                                len(team1.unit_list_inst)+1,
-                                int,
-                                f"\nEnter unit's number (1 - {len(team1.unit_list_inst)}): ") - 1,
                       team2)
             game_queue = False
         else:
             print("Turn of Team 2!")
             team_info(team2)
+            sleep(0.5)
             team_info(team1)
             team_turn(option_menu(),
                       new_board,
                       team2,
-                      ret_valid(0,
-                                len(team2.unit_list_inst) + 1,
-                                int,
-                                f"\nEnter unit's number (1 - {len(team2.unit_list_inst)}): ") - 1,
                       team1)
             game_queue = True
         new_board.empty_board()
-
-        for team in teams:
-            team.health_check()
 
 if __name__ == "__main__":
     main()

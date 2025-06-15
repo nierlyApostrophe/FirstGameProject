@@ -7,7 +7,6 @@ class Unit(ABC):
 
     def __init__(self):
         self.moves: int = 0
-        self.attack_radius = self.moves / 2
         self.health: int = 0
         self.damage: int = 0
         self.x: int = 0
@@ -40,7 +39,6 @@ class Unit(ABC):
         Removes the unit from the board whenever its health fully depletes
         """
         if self.health <= 0:
-            print(f"{self.name} has died")
             return True
 
 class Infantry(Unit):
@@ -51,7 +49,7 @@ class Infantry(Unit):
     def __init__(self):
         super().__init__()
         self.moves = 2
-        self.health = 1
+        self.health = 4
         self.damage = 4
 
 
@@ -63,8 +61,8 @@ class Cavalry(Unit):
     def __init__(self):
         super().__init__()
         self.moves = 4
-        self.health = 7
-        self.damage = 2
+        self.health = 10
+        self.damage = 1
 
 if __name__ == "__main__":
     help(Unit)
