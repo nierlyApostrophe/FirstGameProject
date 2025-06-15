@@ -11,7 +11,7 @@ The game goes on infinitely until all the units of a Team are dead.
 then you will be asked to input the amount of infantry (each team decides themselves).  
 1. This is the end of initialization, and where the main loop begins.
 1. You will then see the X and Y axes as well as the created board with both teams' units.  
-1. **Team 1**:  
+   **Team 1**:  
 1. You will be presented with a choice: **to move or to attack**.
 1. After the choice's been made you have to input the number, 
 which corresponds to the unit you will select from an array of units.  
