@@ -1,6 +1,3 @@
-# todo
-#  Додати валідацію delta_x, delta_y у team_turn() (юніт не може виходити за межі дошки)
-
 import team_create as tc
 import board_create as bc
 import unit_create as uc
@@ -94,12 +91,20 @@ def new_delta_coords() -> tuple[int, int]:
     """
     return (ret_of_type(input("Enter delta X: "), int, "Enter delta X: "),
             ret_of_type(input("Enter delta Y: "), int, "Enter delta Y: "))
-    # return int(input("Enter delta X: ")), int(input("Enter delta Y: "))
 
 def team_turn(option: int,
               board: bc.Board,
               team: tc.Team,
-              enemy_team: tc.Team) -> None:
+              enemy_team: tc.Team) -> bool | None:
+    """
+    Performs a turn over a unit for a selected team
+    (i.e. unit selection, movement, attack)
+    :param option: refers to the main.option_menu()
+    :param board: current board
+    :param team: which team's turn it is
+    :param enemy_team: team, which units will be attacked
+    :return: returns False if new coordinates are out of bounds / True if new coordinates were accepted
+    """
 
     if option == 3:
         print("Exiting the program")
@@ -115,37 +120,34 @@ def team_turn(option: int,
         new_x = delta_x + team.unit_list_inst[unit_id].x
         new_y = delta_y + team.unit_list_inst[unit_id].y
         if 0 > new_x > board.board_size and 0 > new_y > board.board_size:
-            print("Invalid coordinates")
-            return
+            print(f"Invalid input; coordinates out of bounds: 0 <= (x, y) <= {board.board_size-1}")
+            return False
         if board.get_occupancy_board()[new_x][new_y] == "0":
             team.unit_list_inst[unit_id].move(delta_x,
                                               delta_y,
                                               board.board_size)
+            return True
+        print("Unable to move to an already occupied square")
+        return False
 
     elif option == 2:
         delta_x, delta_y = new_delta_coords()
         attack_x = delta_x + team.unit_list_inst[unit_id].x
         attack_y = delta_y + team.unit_list_inst[unit_id].y
+        if 0 > attack_x or attack_x > board.board_size or 0 > attack_y or attack_y > board.board_size:
+            print(f"Invalid input; coordinates out of bounds: 0 <= (x, y) <= {board.board_size-1}")
+            return False
         if board.get_occupancy_board()[attack_x][attack_y] == enemy_team.symbol:
             for enemy_unit in enemy_team.unit_list_inst:
                 if enemy_unit.x == attack_x and enemy_unit.y == attack_y:
                     enemy_unit.health -= team.unit_list_inst[unit_id].damage
                     print(f"Successfully attacked {enemy_unit.name} at ({enemy_unit.x}, {enemy_unit.y})\n")
-                    return
+                    return True
         print(f"Failed to find an enemy at ({attack_x}, {attack_y})\n")
-
+        return False
 
     else:
         print("Invalid choice!")
-    """
-    Performs a turn over a unit for a selected team
-    (i.e. unit selection, movement, attack)
-    :param option: refers to the main.option_menu()
-    :param board: current board
-    :param team: which team's turn it is
-    :param unit_id: id of a unit to be selected
-    :param enemy_team: team, which units will be attacked
-    """
 
 def team_info(team: tc.Team):
     """
@@ -206,20 +208,16 @@ def main() -> None:
             team_info(team1)
             sleep(0.5)
             team_info(team2)
-            team_turn(option_menu(),
-                      new_board,
-                      team1,
-                      team2)
+            while not team_turn(option_menu(), new_board, team1, team2):
+                pass
             game_queue = False
         else:
             print("Turn of Team 2!")
             team_info(team2)
             sleep(0.5)
             team_info(team1)
-            team_turn(option_menu(),
-                      new_board,
-                      team2,
-                      team1)
+            while not team_turn(option_menu(), new_board, team2, team1):
+                pass
             game_queue = True
         new_board.empty_board()
 
